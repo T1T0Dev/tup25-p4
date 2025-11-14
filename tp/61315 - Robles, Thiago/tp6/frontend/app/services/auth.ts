@@ -1,9 +1,9 @@
-import { Usuario } from "../types";
+import { Usuario, LoginInput } from "../types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 
-export const iniciarSesion = async (datos: Usuario) => {
+export const iniciarSesion = async (datos: LoginInput) => {
 
   console.log("Iniciando sesión con datos:", datos);
   
@@ -58,13 +58,13 @@ export const registrarUsuario = async (datos: Usuario) => {
   return (await respuesta.json()) as {id: number; nombre: string; email: string }
 };
 
-export const cerrarSesion = () => {
+export const cerrarSesion =  async () => {
   if (typeof window !== "undefined") {
     localStorage.removeItem("token");
     localStorage.removeItem("usuarioId");
     window.dispatchEvent(new CustomEvent("auth:changed"));
   }
-  const respuesta = fetch(`${API_URL}/cerrar-sesion`, {
+  const respuesta = await fetch(`${API_URL}/cerrar-sesion`, {
     method: "POST",
   });
 

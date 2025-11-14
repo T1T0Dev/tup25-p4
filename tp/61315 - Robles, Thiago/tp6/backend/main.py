@@ -4,8 +4,8 @@ from fastapi.staticfiles import StaticFiles
 
 from sqlmodel import SQLModel, Session, create_engine, select
 from sqlalchemy import or_
-from pydantic import BaseModel, Field as PydanticField
-from pydantic import field_validator, AliasChoices
+from pydantic import  Field as PydanticField
+
 
 from typing import Optional
 
@@ -15,10 +15,10 @@ from passlib.context import CryptContext
 from passlib.exc import UnknownHashError
 
 
-from models.usuario import Usuario
+from models.usuario import Usuario, UsuarioRegistroIn, UsuarioLoginIn
 from models.producto import Producto
 from models.compra import Compras, CompraItem
-from models.carrito import Carrito, CarritoItem
+from models.carrito import Carrito, CarritoItem, AgregarCarritoIn, FinalizarCompraIn
 
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
@@ -111,13 +111,6 @@ def crear_token(datos: dict, expires_delta: int | None = None):
     return token
 
 
-class UsuarioRegistroIn(BaseModel):
-    nombre: str
-    email: str
-    # Acepta tanto "password" como "contraseña" desde el cuerpo JSON
-    contraseña: str = PydanticField(
-        ..., validation_alias=AliasChoices("password", "contraseña")
-    )
 
 
 @app.post("/registrar", status_code=201)
@@ -149,27 +142,19 @@ def registrar_usuario(usuario: UsuarioRegistroIn):
         return nuevo_usuario
 
 
-class UsuarioLoginIn(BaseModel):
-    email: Optional[str] = None
-    nombre: Optional[str] = None
-    # Acepta "password" o "contraseña" como clave del JSON
-    contraseña: str = PydanticField(
-        ..., validation_alias=AliasChoices("password", "contraseña")
-    )
 
 
 @app.post("/iniciar-sesion")
 def iniciar_sesion(usuario: UsuarioLoginIn):
 
     with Session(engine) as session:
-        if not usuario.email and not usuario.nombre:
+        if not usuario.email :
             raise HTTPException(status_code=400, detail="Debe enviar email o nombre")
 
         condiciones = []
         if usuario.email:
             condiciones.append(Usuario.email == usuario.email)
-        if usuario.nombre:
-            condiciones.append(Usuario.nombre == usuario.nombre)
+    
 
         usuario_db = session.exec(select(Usuario).where(or_(*condiciones))).first()
 
@@ -275,9 +260,7 @@ def obtener_o_crear_carrito_activo(session: Session, usuario_id: int) -> Carrito
 # ------------------------------
 # POST /carrito → agregar producto
 # ------------------------------
-class AgregarCarritoIn(BaseModel):
-    producto_id: int
-    cantidad: int = 1
+
 
 
 @app.post("/carrito")
@@ -463,9 +446,7 @@ def cancelar_carrito(current_user_id: int = Depends(get_current_user_id)):
 # ------------------------------
 # POST /carrito/finalizar → confirmar compra
 # ------------------------------
-class FinalizarCompraIn(BaseModel):
-    direccion: str
-    tarjeta: str
+
 
 
 @app.post("/carrito/finalizar")

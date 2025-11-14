@@ -4,20 +4,19 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { obtenerCarrito } from "@/app/services/carritos";
-
-type ItemResumen = {
-  nombre: string;
-  precio: number;
-  cantidad: number;
-  categoria?: string;
-};
+import { ItemResumen } from "@/app/types";
 
 export default function ResumenCarrito() {
+
+  // Estado para los items del resumen del carrito
   const [items, setItems] = useState<ItemResumen[]>([]);
 
+  // Cargamos los items del carrito 
   async function cargar() {
     const token =
+
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
     if (!token) {
       setItems([]);
       return;
@@ -45,6 +44,8 @@ export default function ResumenCarrito() {
     return () => window.removeEventListener("cart:changed", refrescar);
   }, []);
 
+
+  // Calculo de totales, utilizamos useMemo para ahorrar cálculos innecesarios
   const { subtotal, iva, envio, total } = useMemo(() => {
     const subtotal = items.reduce(
       (acc, it) => acc + it.precio * it.cantidad,

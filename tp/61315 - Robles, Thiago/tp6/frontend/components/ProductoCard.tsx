@@ -6,7 +6,7 @@ import { ShoppingCart, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Producto } from "@/app/types";
+import { ProductoCardProps } from "@/app/types";
 import {
   agregarProductoAlCarrito,
   obtenerCarrito,
@@ -14,9 +14,7 @@ import {
 
 import Swal from "sweetalert2";
 
-interface ProductoCardProps {
-  producto: Producto;
-}
+
 
 export default function ProductoCard({ producto }: ProductoCardProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";

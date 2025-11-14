@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { DatosEnvioProps } from "@/app/types";
+
 const datosEnvioSchema = z.object({
   direccion: z.string().min(6, "Ingresá una dirección válida"),
   tarjeta: z
@@ -22,10 +24,6 @@ const datosEnvioSchema = z.object({
     .max(19, "Demasiados dígitos"),
 });
 
-type DatosEnvioProps = {
-  onConfirmar: (payload: { direccion: string; tarjeta: string }) => Promise<void>;
-  loading: boolean;
-};
 
 export default function DatosEnvio({ onConfirmar, loading }: DatosEnvioProps) {
   const [direccion, setDireccion] = useState("");

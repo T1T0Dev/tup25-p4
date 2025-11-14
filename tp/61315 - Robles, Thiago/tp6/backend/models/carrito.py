@@ -1,5 +1,6 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel
+from pydantic import BaseModel
 
 class Carrito(SQLModel, table=True):
     __tablename__ = "carritos"
@@ -15,3 +16,13 @@ class CarritoItem(SQLModel, table=True):
     producto_id: Optional[int] = Field(default=None, foreign_key="productos.id")
     cantidad: int = Field(default=1, ge=1)
 
+
+class AgregarCarritoIn(BaseModel):
+    producto_id: int
+    cantidad: int = 1
+    
+
+class FinalizarCompraIn(BaseModel):
+    direccion: str
+    tarjeta: str
+    

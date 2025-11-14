@@ -149,6 +149,8 @@ export default function Carrito() {
 
   const articulosValidos = items ?? [];
   // Preferir totales del backend si están disponibles; si no, calcular localmente (en centavos)
+
+  // Lo pasamos a centavos para calculos exactos
   const toCents = (v: number) => Math.round(v * 100);
   const fromCents = (c: number) => c / 100;
 
@@ -162,6 +164,7 @@ export default function Carrito() {
       (acc, it) => acc + toCents(it.precio) * it.cantidad,
       0
     );
+
     const ivaCents = articulosValidos.reduce((acc, it) => {
       const cat = it.categoria?.toLowerCase() ?? "";
       const esElectronico = cat.includes("electr");
@@ -170,6 +173,8 @@ export default function Carrito() {
       return acc + Math.round((baseCents * rate) / 100);
     }, 0);
     const totalSinEnvioCents = subtotalCents + ivaCents;
+
+  
     const envioCents = totalSinEnvioCents > 100000 ? 0 : 5000;
     const totalCents = totalSinEnvioCents + envioCents;
     subtotal = fromCents(subtotalCents);

@@ -1,4 +1,4 @@
-import { Carrito } from "../types";
+import { Carrito, CarritoItemDTO,ProductoDTO } from "../types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -39,33 +39,10 @@ export const obtenerCarrito = async (): Promise<Carrito> => {
     };
   }
 
-  // Mapear items del backend → productos[] esperados por el frontend
-  interface RawProducto {
-    id?: number;
-    titulo?: string;
-    nombre?: string;
-    precio?: number;
-    existencia?: number;
-    imagen?: string;
-    categoria?: string;
-    activo?: boolean;
-  }
-  interface RawItem {
-    producto_id?: number;
-    cantidad?: number;
-    subtotal?: number;
-    producto?: RawProducto;
-    // llano (cuando backend no anida producto)
-    nombre?: string;
-    precio?: number;
-    existencia?: number;
-    imagen?: string;
-    categoria?: string;
-  }
   type CarritoProducto = NonNullable<Carrito["productos"]>[number];
   const productos: CarritoProducto[] = (raw.items ?? []).map(
-    (it: RawItem): CarritoProducto => {
-      const prod = it.producto ?? ({} as RawProducto);
+    (it: CarritoItemDTO): CarritoProducto => {
+      const prod = it.producto ?? ({} as ProductoDTO);
       const precio =
         typeof prod.precio === "number"
           ? prod.precio
